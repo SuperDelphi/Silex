@@ -60,6 +60,7 @@ import { internalLinksPlugin } from './internal-links'
 import publicationManagerPlugin, { PublicationManagerOptions } from './PublicationManager'
 import ViewButtons from './view-buttons'
 import { storagePlugin } from './storage'
+import { keybindsPlugin } from './keybinds'
 import { API_PATH, API_WEBSITE_ASSETS_WRITE, API_WEBSITE_PATH } from '../../constants'
 import { ClientConfig } from '../config'
 
@@ -85,6 +86,7 @@ const plugins = [
   {name: '@silexlabs/grapesjs-symbols', value: symbolsPlugin},
   {name: './PublicationManager', value: publicationManagerPlugin},
   {name: './storage', value: storagePlugin},
+  {name: './keybinds', value: keybindsPlugin},
   {name: './LoginDialog', value: loginDialogPlugin},
   {name: '@silexlabs/grapesjs-loading', value: loadingPlugin},
   {name: './breadcrumbs', value: breadcrumbsPlugin},
