@@ -23,7 +23,7 @@ export type TScopes = {
   [key: string]: TriggerScope
 }
 
-const TriggerScopes: TScopes = {
+export const TriggerScopes: TScopes = {
   GLOBAL: {
     name: 'Global',
     description: 'Applies everywhere in the editor.',
@@ -90,7 +90,7 @@ export const keybindsMap: Map<string, KeyBind> = new Map()
  * ```
  * Examples: ``ctrl+j``, ``p``, ``ctrl+alt+shift+t``, etc.
  */
-export function setKeyBind(editor: Editor, keys: string, handler: ((editor: Editor) => void) | string, scope: TriggerScope = TriggerScopes.GLOBAL, preventDefault: boolean = true): KeyBind {
+export function setKeybind(editor: Editor, keys: string, handler: ((editor: Editor) => void) | string, scope: TriggerScope = TriggerScopes.GLOBAL, preventDefault: boolean = true): KeyBind {
   const splitKeys = keys.toLowerCase().split(keySep)
 
   if (splitKeys.length > 0) {
@@ -163,6 +163,8 @@ function formattedModifiersFrom(event: KeyboardEvent): string {
   return modifiers.join(keySep)
 }
 
+let pendingKey: string = null
+
 /**
  * The function that initializes the keybindings' plugin.
  * It starts watching for registered keybindings.
@@ -170,14 +172,14 @@ function formattedModifiersFrom(event: KeyboardEvent): string {
  */
 export function keybindsPlugin(editor: Editor) {
   window.addEventListener('keydown', event => {
+    if (pendingKey) return
+
     const modifiers: string = formattedModifiersFrom(event)
 
     keybindsMap.forEach(keybind => {
       if (keybind.modifiers === modifiers && keybind.key === event.key.toLowerCase() && keybind.scope.condition(editor, event)) {
+        pendingKey = keybind.key
         const keyId: string = keybind.modifiers + keySep + keybind.key
-
-        // We prevent the default behaviour
-        if (keybind.preventDefault) event.preventDefault()
 
         // We run the command/execute the callback
         if (typeof keybind.handler === 'string') {
@@ -189,7 +191,18 @@ export function keybindsPlugin(editor: Editor) {
         // We emit events
         editor.trigger(eventName + ':emit', keybind, event)
         editor.trigger(eventName + ':emit:' + keyId, keybind, event)
+
+        // We prevent the default behaviour
+        if (keybind.preventDefault) {
+          event.preventDefault()
+          event.stopPropagation()
+          return false
+        }
       }
     })
+  })
+
+  window.addEventListener('keyup', event => {
+    if (pendingKey === event.key.toLowerCase()) pendingKey = null
   })
 }

@@ -61,6 +61,7 @@ import publicationManagerPlugin, { PublicationManagerOptions } from './Publicati
 import ViewButtons from './view-buttons'
 import { storagePlugin } from './storage'
 import { keybindsPlugin } from './keybindsPlugin'
+import defaultKeybinds from './default-keybinds'
 import { API_PATH, API_WEBSITE_ASSETS_WRITE, API_WEBSITE_PATH } from '../../constants'
 import { ClientConfig } from '../config'
 
@@ -87,6 +88,7 @@ const plugins = [
   {name: './PublicationManager', value: publicationManagerPlugin},
   {name: './storage', value: storagePlugin},
   {name: './keybindsPlugin', value: keybindsPlugin},
+  {name: './default-keybinds', value: defaultKeybinds},
   {name: './LoginDialog', value: loginDialogPlugin},
   {name: '@silexlabs/grapesjs-loading', value: loadingPlugin},
   {name: './breadcrumbs', value: breadcrumbsPlugin},
@@ -118,6 +120,12 @@ const LIGHTER_PRIMARY_COLOR = '#575757'
 // ////////////////////
 const catBasic = 'Containers'
 const catComponents = 'Components'
+
+// Commands
+export const cmdToggleLayers = 'open-layers'
+export const cmdToggleBlocks = 'open-blocks'
+export const cmdToggleSymbols = 'open-symbols'
+export const cmdToggleNotifications = 'open-notifications'
 
 export function getEditorConfig(config: ClientConfig): EditorConfig {
   const { websiteId, storageId, rootUrl } = config
@@ -198,12 +206,12 @@ export function getEditorConfig(config: ClientConfig): EditorConfig {
             id: 'block-manager-btn',
             className: 'block-manager-btn fa fa-fw fa-plus',
             attributes: { title: 'Blocks', containerClassName: 'block-manager-container', },
-            command: 'open-blocks',
+            command: cmdToggleBlocks,
           }, {
             id: 'symbols-btn',
             className: 'symbols-btn fa-regular fa-gem',
             attributes: { title: 'Symbols', containerClassName: 'symbols-list-container', },
-            command: 'open-symbols',
+            command: cmdToggleSymbols,
             buttons: [
               {
                 id: 'symbol-create-button',
@@ -226,7 +234,7 @@ export function getEditorConfig(config: ClientConfig): EditorConfig {
             id: 'layer-manager-btn',
             className: 'layer-manager-btn fa-solid fa-layer-group',
             attributes: { title: 'Layers', containerClassName: 'layer-manager-container', },
-            command: 'open-layers',
+            command: cmdToggleLayers,
           }, {
             id: 'font-dialog-btn',
             className: 'font-manager-btn fa-solid fa-font',
@@ -247,7 +255,7 @@ export function getEditorConfig(config: ClientConfig): EditorConfig {
             id: 'notifications-btn',
             className: 'notifications-btn fa-regular fa-bell',
             attributes: { title: 'Notifications', containerClassName: 'notifications-container', },
-            command: 'open-notifications',
+            command: cmdToggleNotifications,
             buttons: [{
               className: 'gjs-pn-btn',
               command: 'notifications:clear',
@@ -370,8 +378,8 @@ export async function initEditor(config: EditorConfig) {
 
       // Remove blocks and layers buttons from the properties
       // This is because in Silex they are on the left
-      views.buttons.remove('open-blocks')
-      views.buttons.remove('open-layers')
+      views.buttons.remove(cmdToggleBlocks)
+      views.buttons.remove(cmdToggleLayers)
 
       // Remove useless buttons
       editor.Panels.getPanel('options').buttons.remove('export-template')
