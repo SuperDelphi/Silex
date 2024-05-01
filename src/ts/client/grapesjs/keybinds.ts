@@ -1,4 +1,4 @@
-import { Editor } from 'grapesjs'
+import {Component, Editor} from 'grapesjs'
 import { cmdAddPage } from './page-panel'
 
 /**
@@ -16,24 +16,42 @@ export enum KeyModifiers {
  */
 export type TriggerScope = {
   name: string,
-  condition: (editor: Editor) => boolean
+  description: string,
+  condition: (editor: Editor, event: KeyboardEvent) => boolean
 }
 
-const TriggerScopes = {
+export type TScopes = {
+  [key: string]: TriggerScope
+}
+
+const TriggerScopes: TScopes = {
   GLOBAL: {
     name: 'Global',
     description: 'Applies everywhere in the editor.',
     condition: editor => true
   },
   GLOBAL_NO_TEXT_EDIT: {
-    name: 'Global (Excepted Text Edition)',
+    name: 'Global (Except Text Edition)',
     description: 'Applies everywhere but while editing text.',
-    condition: editor => true // TODO: Replace
+    condition: (editor, event) => !TriggerScopes.TEXT_EDIT.condition(editor, event)
+  },
+  COMPONENT_SELECTION: {
+    name: 'Component Selection',
+    description: 'Applies when a component is selected.',
+    condition: editor => !!editor.getSelected()
   },
   TEXT_EDIT: {
     name: 'Text Edition',
     description: 'Applies while editing text.',
-    condition: editor => true // TODO: Replace
+    condition: (editor, event) => {
+      const component: Component = editor.getEditing()
+      const target = event.target as HTMLElement | null
+
+      const richEditing: boolean = component !== undefined && component !== null
+      const inTextInput: boolean = target && ['TEXTAREA', 'INPUT'].includes(target.tagName)
+
+      return richEditing || inTextInput
+    }
   }
 }
 
@@ -55,7 +73,7 @@ const eventName: string = 'keybind'
 export type KeyBind = {
   key: string,
   modifiers: string,
-  command: string,
+  handler: ((editor: Editor) => void) | string,
   scope: TriggerScope,
   preventDefault: boolean,
 }
@@ -73,14 +91,14 @@ export const keybindsMap: Map<string, KeyBind> = new Map()
  * ```
  * Examples: ``ctrl+j``, ``p``, ``ctrl+alt+shift+t``, etc.
  */
-export function setKeyBind(editor: Editor, keys: string, command: string, scope: TriggerScope = TriggerScopes.GLOBAL, preventDefault: boolean = true): KeyBind {
+export function setKeyBind(editor: Editor, keys: string, handler: ((editor: Editor) => void) | string, scope: TriggerScope = TriggerScopes.GLOBAL, preventDefault: boolean = true): KeyBind {
   const splitKeys = keys.toLowerCase().split(keySep)
 
   if (splitKeys.length > 0) {
     const key: string = splitKeys.pop()
     const modifiers: string = formattedModifiers(splitKeys)
 
-    const keyBind: KeyBind = {key, modifiers, command, scope, preventDefault}
+    const keyBind: KeyBind = {key, modifiers, handler, scope, preventDefault}
     const entryKey: string = modifiers + keySep + key
 
     if (!keybindsMap.has(entryKey)) {
@@ -152,19 +170,27 @@ function formattedModifiersFrom(event: KeyboardEvent): string {
  * @param editor The editor.
  */
 export function keybindsPlugin(editor: Editor) {
-  console.log(setKeyBind(editor, 'shift+n', cmdAddPage, TriggerScopes.GLOBAL_NO_TEXT_EDIT))
+  setKeyBind(editor, 'shift+n', cmdAddPage, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
 
   window.addEventListener('keydown', event => {
     const modifiers: string = formattedModifiersFrom(event)
 
     keybindsMap.forEach(keybind => {
-      if (keybind.scope.condition(editor) && keybind.modifiers === modifiers && keybind.key === event.key.toLowerCase()) {
+      if (keybind.modifiers === modifiers && keybind.key === event.key.toLowerCase() && keybind.scope.condition(editor, event)) {
         const keyId: string = keybind.modifiers + keySep + keybind.key
 
+        // We prevent the default behaviour
         if (keybind.preventDefault) event.preventDefault()
+
+        // We run the command/execute the callback
+        if (typeof keybind.handler === 'string') {
+          editor.runCommand(keybind.handler)
+        } else {
+          keybind.handler(editor)
+        }
+
         editor.trigger(eventName + ':emit', keybind, event)
         editor.trigger(eventName + ':emit:' + keyId, keybind, event)
-        editor.runCommand(keybind.command)
       }
     })
   })
