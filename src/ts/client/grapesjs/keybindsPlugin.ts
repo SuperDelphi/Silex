@@ -1,5 +1,4 @@
 import {Component, Editor} from 'grapesjs'
-import { cmdAddPage } from './page-panel'
 
 /**
  * Represents key modifiers.
@@ -170,8 +169,6 @@ function formattedModifiersFrom(event: KeyboardEvent): string {
  * @param editor The editor.
  */
 export function keybindsPlugin(editor: Editor) {
-  setKeyBind(editor, 'shift+n', cmdAddPage, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
-
   window.addEventListener('keydown', event => {
     const modifiers: string = formattedModifiersFrom(event)
 
@@ -189,6 +186,7 @@ export function keybindsPlugin(editor: Editor) {
           keybind.handler(editor)
         }
 
+        // We emit events
         editor.trigger(eventName + ':emit', keybind, event)
         editor.trigger(eventName + ':emit:' + keyId, keybind, event)
       }

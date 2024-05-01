@@ -39,12 +39,12 @@ export default function loginDialogPlugin(editor, opts) {
 
   // Commands and events
   editor.Commands.add(cmdLogin, {
-    async run(editor: Editor) {  await openDialog() },
+    async run(editor: Editor) { await openDialog() },
     stop(editor: Editor) { closeDialog() },
   })
   editor.Commands.add(cmdLogout, {
     async run(editor: Editor) {
-      await logout({type: ConnectorType.STORAGE })
+      await logout({ type: ConnectorType.STORAGE })
       editor.getModel().set('user', null)
       editor.trigger(eventLoggedOut)
     },

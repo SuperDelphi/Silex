@@ -60,7 +60,7 @@ import { internalLinksPlugin } from './internal-links'
 import publicationManagerPlugin, { PublicationManagerOptions } from './PublicationManager'
 import ViewButtons from './view-buttons'
 import { storagePlugin } from './storage'
-import { keybindsPlugin } from './keybinds'
+import { keybindsPlugin } from './keybindsPlugin'
 import { API_PATH, API_WEBSITE_ASSETS_WRITE, API_WEBSITE_PATH } from '../../constants'
 import { ClientConfig } from '../config'
 
@@ -86,7 +86,7 @@ const plugins = [
   {name: '@silexlabs/grapesjs-symbols', value: symbolsPlugin},
   {name: './PublicationManager', value: publicationManagerPlugin},
   {name: './storage', value: storagePlugin},
-  {name: './keybinds', value: keybindsPlugin},
+  {name: './keybindsPlugin', value: keybindsPlugin},
   {name: './LoginDialog', value: loginDialogPlugin},
   {name: '@silexlabs/grapesjs-loading', value: loadingPlugin},
   {name: './breadcrumbs', value: breadcrumbsPlugin},
@@ -348,7 +348,7 @@ export async function initEditor(config: EditorConfig) {
       reject(e)
     }
 
-    // customize the editor
+    // Customize the editor
     ['text']
       .forEach(id => editor.Blocks.get(id)?.set('category', 'Basics'))
     ;['image', 'video']
@@ -380,7 +380,7 @@ export async function initEditor(config: EditorConfig) {
       // Render the block manager, otherwise it is empty
       editor.BlockManager.render(null)
 
-      // use the style filter plugin
+      // Use the style filter plugin
       editor.StyleManager.addProperty('extra', { extend: 'filter' })
 
       // Add the notifications container
@@ -396,7 +396,7 @@ export async function initEditor(config: EditorConfig) {
         }
       )
 
-      // GrapesJs editor is ready
+      // GrapesJS editor is ready
       resolve(editor)
     })
   })
