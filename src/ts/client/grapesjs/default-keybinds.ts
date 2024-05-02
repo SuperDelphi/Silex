@@ -15,6 +15,7 @@ function runRTEAction(editor: Editor, action: string) {
 
 // TODO: Close other (left) panels when opening one
 // TODO: Make them close when repeating the same keybinding
+// FIXME: Page open dialog bugged
 
 export default function (editor: Editor) {
   // General keybindings
@@ -37,6 +38,6 @@ export default function (editor: Editor) {
     editor.runCommand(cmdPublish)
     editor.runCommand(cmdPublicationStart)
   }, TriggerScopes.GLOBAL)
-  setKeybind(editor, 'ctrl+shift+a', cmdPromptAddSymbol, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
-  setKeybind(editor, 'ctrl+shift+n', cmdOpenNewPageDialog, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
+  setKeybind(editor, 'alt+shift+a', cmdPromptAddSymbol, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
+  setKeybind(editor, 'alt+shift+p', cmdOpenNewPageDialog, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
 }

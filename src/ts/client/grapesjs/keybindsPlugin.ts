@@ -1,4 +1,4 @@
-import {Component, Editor} from 'grapesjs'
+import { Component, Editor } from 'grapesjs'
 
 /**
  * Represents key modifiers.
@@ -178,6 +178,12 @@ export function keybindsPlugin(editor: Editor) {
 
     keybindsMap.forEach(keybind => {
       if (keybind.modifiers === modifiers && keybind.key === event.key.toLowerCase() && keybind.scope.condition(editor, event)) {
+        // We prevent the default behaviour
+        if (keybind.preventDefault) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
         pendingKey = keybind.key
         const keyId: string = keybind.modifiers + keySep + keybind.key
 
@@ -191,13 +197,6 @@ export function keybindsPlugin(editor: Editor) {
         // We emit events
         editor.trigger(eventName + ':emit', keybind, event)
         editor.trigger(eventName + ':emit:' + keyId, keybind, event)
-
-        // We prevent the default behaviour
-        if (keybind.preventDefault) {
-          event.preventDefault()
-          event.stopPropagation()
-          return false
-        }
       }
     })
   })
