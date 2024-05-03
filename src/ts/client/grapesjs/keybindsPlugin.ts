@@ -43,10 +43,9 @@ export const TriggerScopes: TScopes = {
     name: 'Text Edition',
     description: 'Applies while editing text.',
     condition: (editor, event) => {
-      const component: Component = editor.getEditing()
       const target = event.target as HTMLElement | null
 
-      const richEditing: boolean = component !== undefined && component !== null
+      const richEditing: boolean = editor.getEditing() !== null
       const inTextInput: boolean = target && ['TEXTAREA', 'INPUT'].includes(target.tagName)
 
       return richEditing || inTextInput

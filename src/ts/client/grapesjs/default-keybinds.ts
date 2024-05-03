@@ -40,4 +40,18 @@ export default function (editor: Editor) {
   }, TriggerScopes.GLOBAL)
   setKeybind(editor, 'alt+shift+a', cmdPromptAddSymbol, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
   setKeybind(editor, 'alt+shift+p', cmdOpenNewPageDialog, TriggerScopes.GLOBAL_NO_TEXT_EDIT)
+
+  // Utility function
+  function runAction(editor: Editor, action: string) {
+    const rte = editor.RichTextEditor
+    rte.run(rte.get(action))
+  }
+
+  // GRAPESJS - Meant to toggle "bold" while editing a Rich Text => doesn't work because keymaps don't work during text edition
+  editor.Keymaps.add('general:open-settings', 'alt+p', e => {
+    if (e.getEditing() !== null) runAction(e, 'bold')
+  })
+
+  // KEYBINDS (my code)
+  setKeybind(editor, 'alt+p', e => runAction(e, 'bold'), TriggerScopes.TEXT_EDIT)
 }
