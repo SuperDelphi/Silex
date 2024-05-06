@@ -13,11 +13,10 @@ const selectBody = (editor: Editor): void => {
 }
 
 const toggleCommand = (editor: Editor, name: string): void => {
-  resetPanel(editor)
-
   const cmd = editor.Commands
 
   if (!cmd.isActive(name)) {
+    resetPanel(editor)
     cmd.run(name)
   } else {
     cmd.stop(name)
