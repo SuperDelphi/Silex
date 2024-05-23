@@ -58,6 +58,7 @@ function escapeContext(editor: Editor): void {
 // Constants
 
 export const cmdSelectBody = 'select-body'
+export const cmdDuplicateSelection = 'duplicate-selection'
 export let prefixKey = 'shift'
 
 export const defaultKms = {
@@ -116,6 +117,12 @@ export const defaultKms = {
     id: 'workflow:select-body',
     keys: prefixKey + '+b',
     handler: cmdSelectBody
+  },
+  kmDuplicateSelection: {
+    id: 'workflow:duplicate-selection',
+    keys: 'ctrl+d',
+    handler: 'tlb-clone',
+    options: {prevent: true}
   }
 }
 
@@ -134,6 +141,9 @@ export function keymapsPlugin(editor: Editor, opts: PluginOptions): void {
   for (const keymap in defaultKms) {
     km.add(defaultKms[keymap].id, defaultKms[keymap].keys, defaultKms[keymap].handler, defaultKms[keymap].options)
   }
+
+  console.log('Keymaps registered:', km.getAll()) // TODO: Remove this line
+  console.log('Commands registered:', editor.Commands.getAll()) // TODO: Remove this line
 
   // Handling the Escape keymap during text edition
   document.addEventListener('keydown', event => {
