@@ -32,6 +32,14 @@ function toggleCommand (editor: Editor, name: string): void {
   }
 }
 
+function openTraitsManager(editor: Editor): void {
+  editor.Panels.getButton('views', 'open-tm').set('active', true)
+}
+
+function openStyleManager(editor: Editor): void {
+  editor.Panels.getButton('views', 'open-sm').set('active', true)
+}
+
 function resetPanel(editor: Editor): void {
   getPanelCommandIds().forEach(p => editor.Commands.stop(p))
 }
@@ -107,6 +115,16 @@ export const defaultKms = {
     id: 'panels:symbols',
     keys: prefixKey + '+s',
     handler: editor => toggleCommand(editor, cmdToggleSymbols)
+  },
+  kmStyleManager: {
+    id: 'panels:style-manager',
+    keys: 'r',
+    handler: openStyleManager
+  },
+  kmTraitsManager: {
+    id: 'panels:traits',
+    keys: 't',
+    handler: openTraitsManager
   },
   kmClosePanel: {
     id: 'panels:close-panel',
