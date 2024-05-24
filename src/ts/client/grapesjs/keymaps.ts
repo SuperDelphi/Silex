@@ -1,13 +1,11 @@
 import {Editor, PluginOptions} from 'grapesjs'
-import {cmdPublish} from './PublicationUi'
 import {cmdOpenFonts} from '@silexlabs/grapesjs-fonts'
 import {cmdToggleBlocks, cmdToggleLayers, cmdToggleNotifications, cmdToggleSymbols} from './index'
 import {cmdTogglePages} from './page-panel'
 import {cmdOpenSettings} from './settings'
 import {isTextOrInputField, selectBody} from '../utils'
 import {PublishableEditor} from './PublicationManager'
-
-// Utility functions
+import {cmdPublish} from './PublicationUi'
 
 function getPanelCommandIds (): string[] {
   return [
@@ -21,6 +19,13 @@ function getPanelCommandIds (): string[] {
   ]
 }
 
+// Utility functions
+
+/**
+ * Toggles a stateful command.
+ * @param editor The editor.
+ * @param name The command name.
+ */
 function toggleCommand (editor: Editor, name: string): void {
   const cmd = editor.Commands
 
@@ -32,14 +37,35 @@ function toggleCommand (editor: Editor, name: string): void {
   }
 }
 
+/**
+ * Opens the Traits Manager panel.
+ * @param editor The editor.
+ */
 function openTraitsManager(editor: Editor): void {
   editor.Panels.getButton('views', 'open-tm').set('active', true)
 }
 
+/**
+ * Opens the Style Manager panel.
+ * @param editor The editor.
+ */
 function openStyleManager(editor: Editor): void {
   editor.Panels.getButton('views', 'open-sm').set('active', true)
 }
 
+/**
+ * Opens the Publish dialog and publishes the website.
+ * @param editor The editor.
+ */
+function publish(editor: Editor): void {
+  editor.runCommand(cmdPublish)
+  editor.runCommand('publish')
+}
+
+/**
+ * Closes any open left panel.
+ * @param editor The editor.
+ */
 function resetPanel(editor: Editor): void {
   getPanelCommandIds().forEach(p => editor.Commands.stop(p))
 }
@@ -78,7 +104,7 @@ export const defaultKms = {
   kmOpenPublish: {
     id: 'general:open-publish',
     keys: 'alt+p',
-    handler: editor => toggleCommand(editor, cmdPublish)
+    handler: cmdPublish
   },
   kmOpenFonts: {
     id: 'general:open-fonts',
@@ -141,6 +167,11 @@ export const defaultKms = {
     keys: 'ctrl+d',
     handler: 'tlb-clone',
     options: {prevent: true}
+  },
+  kmPublish: {
+    id: 'workflow:publish',
+    keys: 'ctrl+alt+p',
+    handler: publish
   }
 }
 
@@ -159,9 +190,6 @@ export function keymapsPlugin(editor: Editor, opts: PluginOptions): void {
   for (const keymap in defaultKms) {
     km.add(defaultKms[keymap].id, defaultKms[keymap].keys, defaultKms[keymap].handler, defaultKms[keymap].options)
   }
-
-  console.log('Keymaps registered:', km.getAll()) // TODO: Remove this line
-  console.log('Commands registered:', editor.Commands.getAll()) // TODO: Remove this line
 
   // Handling the Escape keymap during text edition
   document.addEventListener('keydown', event => {
